@@ -16,8 +16,14 @@ io.on("connection", (socket) => {
     console.log("connected");
 
     socket.on("new-user", (data) => {
-        console.log(data);
+        // console.log(data);
+        socket.broadcast.emit('new-user',data)
     });
+
+    socket.on("mousemove",(coordinates)=>{
+        coordinates.emit("mousemove",{coordinates,id:socket.id})
+    });
+
 });
 
 const port = process.env.PORT || 5001;
