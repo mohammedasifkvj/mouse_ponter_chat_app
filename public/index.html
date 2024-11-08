@@ -24,37 +24,50 @@
         <button>Add user</button>
     </div>
 
+    <div class="coantainer"></div>
+
     <script>
         const socket = io();
         const container=document.querySelector(".container")
-
         const input = document.querySelector("input");
         const button = document.querySelector("button");
-
-        socket.on("connect", () => {
-            console.log("User connected");
-        });
+        const userList={}
 
         button.addEventListener("click", () => {
             socket.emit("new-user", input.value);
             input.value = "";
         });
 
+        socket.on("connect", () => {
+            console.log("User connected");
+        });
+
         socket.on("new-user", (data) => {
+            userList[data.id]=null
             const div=document.createElement("div");
             div.textContent=data;
             container.appendChild(div);
     });
 
     socket.on("mousemove",(data)=>{
+        if(!userList[data.id]){
         const div=document.createElement("div")
-        div.style.width="5px"
-        div.style.height="5px"
-        div.style.backgroundColor="red"
+        div.style.width="10px"
+        div.style.height="10px"
+        div.style.backgroundColor=setBC()
         div.style.position="absolute"
-        div.style.left=data.coordinates.x+"5px"
-        div.style.left=data.coordinates.y+"5px"
+        div.style.borderRadius="50%"
+        userList[data.id]=div;
+        document.body.appendChild(div);
+        }
+        userList[data.id].style.left=data.coordinates.x+"5px"
+        userList[data.id].style.top=data.coordinates.y+"5px"
     });
+
+    const setBC=()=>{
+        const randomColor=Math.floor(Math.random()* 16777215).toString(16)
+        return '#'+randomColor
+    }
 
         document.addEventListener("mousemove",(event)=>{
         socket.emit("mousemove",{x:event.clientX,y:event.clientY});

@@ -12,8 +12,10 @@ app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");  // Use __dirname for absolute path
 });
 
+const user={}
+
 io.on("connection", (socket) => {
-    console.log("connected");
+    console.log("connected",socket.id);
 
     socket.on("new-user", (data) => {
         // console.log(data);
@@ -21,10 +23,9 @@ io.on("connection", (socket) => {
     });
 
     socket.on("mousemove",(coordinates)=>{
-        coordinates.emit("mousemove",{coordinates,id:socket.id})
+        socket.broadcast.emit("mousemove",{coordinates,id:socket.id})
     });
 
 });
-
 const port = process.env.PORT || 5001;
 server.listen(port, () => console.log(`http://127.0.0.1:${port}`));
