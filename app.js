@@ -9,23 +9,28 @@ const io = new Server(server);
 app.use(express.static("public"));
 
 app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html");  // Use __dirname for absolute path
+    res.sendFile(__dirname + "/index.html"); // Use __dirname for absolute path
 });
 
-const user={}
+const users = {};
 
 io.on("connection", (socket) => {
-    console.log("connected",socket.id);
+    console.log("connected", socket.id);
 
-    socket.on("new-user", (data) => {
-        // console.log(data);
-        socket.broadcast.emit('new-user',data)
+    socket.on("new-user", (username) => {
+        users[socket.id] = username;
+        // Broadcast new user to others with ID and username
+        socket.broadcast.emit("new-user", { id: socket.id, name: username });
     });
 
-    socket.on("mousemove",(coordinates)=>{
-        socket.broadcast.emit("mousemove",{coordinates,id:socket.id})
+    socket.on("mousemove", (coordinates) => {
+        socket.broadcast.emit("mousemove", { coordinates, id: socket.id });
     });
 
+    socket.on("disconnect", () => {
+        delete users[socket.id];
+    });
 });
+
 const port = process.env.PORT || 5001;
 server.listen(port, () => console.log(`http://127.0.0.1:${port}`));

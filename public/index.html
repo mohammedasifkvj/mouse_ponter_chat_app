@@ -24,14 +24,14 @@
         <button>Add user</button>
     </div>
 
-    <div class="coantainer"></div>
+    <div class="container"></div>
 
     <script>
         const socket = io();
-        const container=document.querySelector(".container")
+        const container = document.querySelector(".container");
         const input = document.querySelector("input");
         const button = document.querySelector("button");
-        const userList={}
+        const userList = {};
 
         button.addEventListener("click", () => {
             socket.emit("new-user", input.value);
@@ -43,35 +43,38 @@
         });
 
         socket.on("new-user", (data) => {
-            userList[data.id]=null
-            const div=document.createElement("div");
-            div.textContent=data;
+            // Create a div for each new user, showing the user's name
+            userList[data.id] = null;
+            const div = document.createElement("div");
+            div.textContent = data.name;
             container.appendChild(div);
-    });
+        });
 
-    socket.on("mousemove",(data)=>{
-        if(!userList[data.id]){
-        const div=document.createElement("div")
-        div.style.width="10px"
-        div.style.height="10px"
-        div.style.backgroundColor=setBC()
-        div.style.position="absolute"
-        div.style.borderRadius="50%"
-        userList[data.id]=div;
-        document.body.appendChild(div);
-        }
-        userList[data.id].style.left=data.coordinates.x+"5px"
-        userList[data.id].style.top=data.coordinates.y+"5px"
-    });
+        socket.on("mousemove", (data) => {
+            // Check if a cursor div exists for this user, create one if not
+            if (!userList[data.id]) {
+                const div = document.createElement("div");
+                div.style.width = "10px";
+                div.style.height = "10px";
+                div.style.backgroundColor = setBC();
+                div.style.position = "absolute";
+                div.style.borderRadius = "50%";
+                userList[data.id] = div;
+                document.body.appendChild(div);
+            }
+            userList[data.id].style.left = data.coordinates.x + "px";
+            userList[data.id].style.top = data.coordinates.y + "px";
+        });
 
-    const setBC=()=>{
-        const randomColor=Math.floor(Math.random()* 16777215).toString(16)
-        return '#'+randomColor
-    }
+        const setBC = () => {
+            const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+            return "#" + randomColor;
+        };
 
-        document.addEventListener("mousemove",(event)=>{
-        socket.emit("mousemove",{x:event.clientX,y:event.clientY});
-    });
+        // Emit mouse coordinates on every movement
+        document.addEventListener("mousemove", (event) => {
+            socket.emit("mousemove", { x: event.clientX, y: event.clientY });
+        });
     </script>
 </body>
 </html>
