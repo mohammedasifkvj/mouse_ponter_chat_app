@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 20px;
-            padding: 0;
-        }
-        body {
-            background-color: black;
-            color: burlywood;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 20px;
+      padding: 0;
+    }
+
+    body {
+      background-color: black;
+      color: burlywood;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
-    <div>
-        <input type="text">
-        <button>Add user</button>
-    </div>
+  <div>
+    <input type="text">
+    <button>Add user</button>
+  </div>
 
-    <div class="container"></div>
+  <div class="container"></div>
 
-    <script>
-        const socket = io();
-        const container = document.querySelector(".container");
-        const input = document.querySelector("input");
-        const button = document.querySelector("button");
-        const userList = {};
+  <script>
+    const socket = io();
+    const container = document.querySelector(".container");
+    const input = document.querySelector("input");
+    const button = document.querySelector("button");
+    const userList = {};
 
-        button.addEventListener("click", () => {
-            socket.emit("new-user", input.value);
-            input.value = "";
-        });
+    button.addEventListener("click", () => {
+      socket.emit("new-user", input.value);
+      input.value = "";
+    });
 
-        socket.on("connect", () => {
-            console.log("User connected");
-        });
+    socket.on("connect", () => {
+      console.log("User connected");
+    });
 
-        socket.on("new-user", (data) => {
-            // Create a div for each new user, showing the user's name
-            userList[data.id] = null;
-            const div = document.createElement("div");
-            div.textContent = data.name;
-            container.appendChild(div);
-        });
+    socket.on("new-user", (data) => {
+      // Create a div for each new user, showing the user's name
+      userList[data.id] = null;
+      const div = document.createElement("div");
+      div.textContent = data.name;
+      container.appendChild(div);
+    });
 
-        socket.on("mousemove", (data) => {
-            // Check if a cursor div exists for this user, create one if not
-            if (!userList[data.id]) {
-                const div = document.createElement("div");
-                div.style.width = "10px";
-                div.style.height = "10px";
-                div.style.backgroundColor = setBC();
-                div.style.position = "absolute";
-                div.style.borderRadius = "50%";
-                userList[data.id] = div;
-                document.body.appendChild(div);
-            }
-            userList[data.id].style.left = data.coordinates.x + "px";
-            userList[data.id].style.top = data.coordinates.y + "px";
-        });
+    socket.on("mousemove", (data) => {
+      // Check if a cursor div exists for this user, create one if not
+      if (!userList[data.id]) {
+        const div = document.createElement("div");
+        div.style.width = "10px";
+        div.style.height = "10px";
+        div.style.backgroundColor = setBC();
+        div.style.position = "absolute";
+        div.style.borderRadius = "50%";
+        userList[data.id] = div;
+        document.body.appendChild(div);
+      }
+      userList[data.id].style.left = data.coordinates.x + "px";
+      userList[data.id].style.top = data.coordinates.y + "px";
+    });
 
-        const setBC = () => {
-            const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-            return "#" + randomColor;
-        };
+    const setBC = () => {
+      const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+      return "#" + randomColor;
+    };
 
-        // Emit mouse coordinates on every movement
-        document.addEventListener("mousemove", (event) => {
-            socket.emit("mousemove", { x: event.clientX, y: event.clientY });
-        });
-    </script>
+    // Emit mouse coordinates on every movement
+    document.addEventListener("mousemove", (event) => {
+      socket.emit("mousemove", {
+        x: event.clientX,
+        y: event.clientY
+      });
+    });
+  </script>
 </body>
+
 </html>
