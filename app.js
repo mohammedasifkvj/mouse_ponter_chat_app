@@ -8,9 +8,6 @@ const io = new Server(server);
 
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
-    res.sendFile(__dirname + "/index.html"); // Use __dirname for absolute path
-});
 
 const users = {};
 
